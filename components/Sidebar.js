@@ -7,9 +7,9 @@ export default function Sidebar() {
   return (
     <div className="hidden sm:flex flex-col p-2 xl:items-start fixed h-full xl:ml-24">
         {/* logo */}
-        <div className="hoverEffect p-0 hover:bg-blue-100 xl:px-1">
+        <a href="/" className="hoverEffect p-0 hover:bg-blue-100 xl:px-1">
             <Image width="50" height="50" src="https://help.twitter.com/content/dam/help-twitter/brand/logo.png" alt="img"></Image>
-        </div>
+        </a>
 
         {/* Menu */}
         <div className="mt-4 mb-2.5 xl:items-start">
