@@ -7,7 +7,7 @@ export default function Feed() {
         {
             id: "1",
             name: "Steve Rogers",
-            username: "onYourLeft",
+            username: "iCanDoThisAllDay",
             userImg: "https://images.news18.com/ibnlive/uploads/2022/07/chris-evans-16574444483x2.jpg?impolicy=website&width=510&height=356",
             img: "https://parade.com/.image/ar_1:1%2Cc_fill%2Ccs_srgb%2Cfl_progressive%2Cq_auto:good%2Cw_1200/MTkwNTgwMTcwMTY2NDQ1MTgx/poster.jpg",
             text: "Avengers Assemble",
