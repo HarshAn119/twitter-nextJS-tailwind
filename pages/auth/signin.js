@@ -22,7 +22,7 @@ export default function signin({ providers }) {
             </p>
             <button
               onClick={() => signIn(provider.id, { callbackUrl: '/' })}
-              className="rounded-lg p-3 text-red-500 border border-red-400 hover:bg-red-500 hover:text-white"
+              className="rounded-lg p-3 text-blue-400 border border-blue-400 hover:bg-blue-400 hover:text-white hover:border-none hover:shadow-md"
             >
               Sign in with {provider.name}
             </button>
