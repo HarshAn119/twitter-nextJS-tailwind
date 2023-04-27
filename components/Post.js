@@ -1,4 +1,4 @@
-import { modalState } from '@/atom/modalAtom';
+import { modalState, postIdState } from '@/atom/modalAtom';
 import { db, storage } from '@/firebase';
 import {
   ChartBarIcon,
@@ -17,7 +17,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { deleteObject, ref } from 'firebase/storage';
-import { signIn, useSession } from 'next-auth/react';
+import { signIn, signOut, useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import Moment from 'react-moment';
@@ -25,8 +25,10 @@ import Moment from 'react-moment';
 export default function Post({ post }) {
   const { data: session } = useSession();
   const [likes, setLikes] = useState([]);
+  const [comments, setComments] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [open, setOpen] = useRecoilState(modalState);
+  const [postId, setPostId] = useRecoilState(postIdState);
 
   useEffect(() => {
     setHasLiked(
@@ -38,6 +40,13 @@ export default function Post({ post }) {
     const unsubscribe = onSnapshot(
       collection(db, 'posts', post.id, 'likes'),
       (snapshot) => setLikes(snapshot.docs)
+    );
+  }, [db]);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(
+      collection(db, 'posts', post.id, 'comments'),
+      (snapshot) => setComments(snapshot.docs)
     );
   }, [db]);
 
@@ -72,7 +81,7 @@ export default function Post({ post }) {
       />
 
       {/* right side */}
-      <div className="">
+      <div className="flex-1">
         {/* header */}
         <div className="flex items-center justify-between">
           {/* user info */}
@@ -106,10 +115,20 @@ export default function Post({ post }) {
 
         {/* icons */}
         <div className="flex justify-between text-gray-500 p-2">
-          <ChatIcon
-            onClick={() => setOpen(!open)}
-            className="h-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"
-          />
+          <div className="flex items-center select-none">
+            <ChatIcon
+              onClick={() => {
+                // if (!session) {
+                //   signIn();
+                // } else {
+                setPostId(post.id);
+                setOpen(!open);
+                // }
+              }}
+              className="h-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"
+            />
+            {comments.length > 0 && <span>{comments.length}</span>}
+          </div>
           {session?.user?.uid === post?.data().id && (
             <TrashIcon
               onClick={deletePost}
