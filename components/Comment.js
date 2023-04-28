@@ -23,10 +23,9 @@ import { useRecoilState } from 'recoil';
 import Moment from 'react-moment';
 import { useRouter } from 'next/router';
 
-export default function Post({ post, id }) {
+export default function Comment({ comment, commentId, originalPostId }) {
   const { data: session } = useSession();
   const [likes, setLikes] = useState([]);
-  const [comments, setComments] = useState([]);
   const [hasLiked, setHasLiked] = useState(false);
   const [open, setOpen] = useRecoilState(modalState);
   const [postId, setPostId] = useRecoilState(postIdState);
@@ -34,17 +33,10 @@ export default function Post({ post, id }) {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(
-      collection(db, 'posts', id, 'likes'),
+      collection(db, 'posts', originalPostId, 'comments', commentId, 'likes'),
       (snapshot) => setLikes(snapshot.docs)
     );
-  }, [db]);
-
-  useEffect(() => {
-    const unsubscribe = onSnapshot(
-      collection(db, 'posts', id, 'comments'),
-      (snapshot) => setComments(snapshot.docs)
-    );
-  }, [db]);
+  }, [db, originalPostId, commentId]);
 
   useEffect(() => {
     setHasLiked(
@@ -52,14 +44,35 @@ export default function Post({ post, id }) {
     );
   }, [likes]);
 
-  const likePost = async () => {
+  const likeComment = async () => {
     if (session) {
       if (hasLiked) {
-        await deleteDoc(doc(db, 'posts', id, 'likes', session?.user.uid));
+        await deleteDoc(
+          doc(
+            db,
+            'posts',
+            originalPostId,
+            'comments',
+            commentId,
+            'likes',
+            session?.user.uid
+          )
+        );
       } else {
-        await setDoc(doc(db, 'posts', id, 'likes', session?.user?.uid), {
-          username: session.user.username,
-        });
+        await setDoc(
+          doc(
+            db,
+            'posts',
+            originalPostId,
+            'comments',
+            commentId,
+            'likes',
+            session?.user?.uid
+          ),
+          {
+            username: session.user.username,
+          }
+        );
       }
     } else {
       // signIn();
@@ -67,20 +80,18 @@ export default function Post({ post, id }) {
     }
   };
 
-  const deletePost = async () => {
+  const deleteComment = async () => {
     if (window.confirm('Are you sure you want to delete this post')) {
-      deleteDoc(doc(db, 'posts', id));
-      if (post.data().image) deleteObject(ref(storage, `posts/${id}/image`));
-      router.push('/');
+      deleteDoc(doc(db, 'posts', originalPostId, 'comments', commentId));
     }
   };
 
   return (
-    <div className="flex p-3 cursor-pointer border-b border-gray-200">
+    <div className="flex p-3 cursor-pointer border-b border-gray-200 pl-20">
       {/* imgage */}
       <img
         className="h-11 w-11 rounded-full mr-4"
-        src={post?.data()?.userImg}
+        src={comment?.userImg}
         alt="user-img"
       />
 
@@ -91,13 +102,13 @@ export default function Post({ post, id }) {
           {/* user info */}
           <div className="flex items-center space-x-1 whitespace-nowrap">
             <h4 className="font-bold text-[15px] sm:text-[16px] hover:underline">
-              {post?.data()?.name}
+              {comment?.name}
             </h4>
             <span className="text-sm sm:text-[15px] text-gray-500">
-              @{post?.data()?.username} -{' '}
+              @{comment?.username} -{' '}
             </span>
             <span className="text-sm sm:text-[15px] hover:underline">
-              <Moment fromNow>{post?.data()?.timestamp?.toDate()}</Moment>
+              <Moment fromNow>{comment?.timestamp?.toDate()}</Moment>
             </span>
           </div>
 
@@ -106,52 +117,40 @@ export default function Post({ post, id }) {
         </div>
 
         {/* post text */}
-        <p
-          onClick={() => router.push(`/posts/${id}`)}
-          className="text-gray-800 text-[15px] sm:text-[16px] mb-2"
-        >
-          {post?.data()?.text}
+        <p className="text-gray-800 text-[15px] sm:text-[16px] mb-2">
+          {comment?.comment}
         </p>
-
-        {/* post img */}
-        <img
-          onClick={() => router.push(`/posts/${id}`)}
-          className="rounded-2xl mr-2 select-none"
-          src={post?.data()?.image}
-          alt="post-img"
-        />
 
         {/* icons */}
         <div className="flex justify-between text-gray-500 p-2">
           <div className="flex items-center select-none">
             <ChatIcon
               onClick={() => {
-                // if (!session) {
-                //   signIn();
-                // } else {
-                setPostId(id);
-                setOpen(!open);
-                // }
+                if (!session) {
+                  signIn();
+                } else {
+                  setPostId(originalPostId);
+                  setOpen(!open);
+                }
               }}
               className="h-9 hoverEffect p-2 hover:text-sky-500 hover:bg-sky-100"
             />
-            {comments.length > 0 && <span>{comments.length}</span>}
           </div>
-          {session?.user?.uid === post?.data()?.id && (
+          {session?.user?.uid === comment?.userId && (
             <TrashIcon
-              onClick={deletePost}
+              onClick={deleteComment}
               className="h-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
             />
           )}
           <div className="flex items-center">
             {hasLiked ? (
               <HeartIconFilled
-                onClick={likePost}
+                onClick={likeComment}
                 className="h-9 hoverEffect p-2 text-red-600 hover:bg-red-100"
               />
             ) : (
               <HeartIcon
-                onClick={likePost}
+                onClick={likeComment}
                 className="h-9 hoverEffect p-2 hover:text-red-600 hover:bg-red-100"
               />
             )}

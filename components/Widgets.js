@@ -23,7 +23,7 @@ export default function Widgets({ newsResults, randomUsersResults }) {
       <div className="text-gray-700 space-y-3 bg-gray-100 rounded-xl pt-2 w-[90%] xl:w-[75%]">
         <h4 className="font-bold text-xl px-4">What's happening</h4>
         <AnimatePresence>
-          {newsResults.slice(0, articleNum).map((article) => (
+          {newsResults?.slice(0, articleNum).map((article) => (
             <motion.div
               key={article.title}
               initial={{ opacity: 0 }}
@@ -45,7 +45,7 @@ export default function Widgets({ newsResults, randomUsersResults }) {
       <div className="sticky top-16 text-gray-700 space-y-3 bg-gray-100 rounded-xl pt-2 w-[90%] xl:w-[75%]">
         <h4 className="font-bold text-xl px-4">Who to follow</h4>
         <AnimatePresence>
-          {randomUsersResults.slice(0, randomUserNum).map((randomUser) => (
+          {randomUsersResults?.slice(0, randomUserNum).map((randomUser) => (
             <motion.div
               key={randomUser.login.username}
               initial={{ opacity: 0 }}

@@ -35,13 +35,14 @@ export default function CommentModal() {
       comment: input,
       name: session?.user?.name,
       username: session?.user?.username,
-      userImg: session?.user?.userImg,
+      // userImg: session?.user?.userImg,
       timestamp: serverTimestamp(),
+      userId: session?.user?.uid,
     });
 
     setOpen(false);
     setInput('');
-    router.push(`posts/${postId}`);
+    router.push(`/posts/${postId}`);
   };
 
   return (
